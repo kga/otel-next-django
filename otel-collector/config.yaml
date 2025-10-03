@@ -12,10 +12,15 @@ processors:
 exporters:
   debug:
     verbosity: detailed
+  otlphttp/mackerel:
+    endpoint: https://otlp-vaxila.mackerelio.com
+    compression: gzip
+    headers:
+      Mackerel-Api-Key: ${env:MACKEREL_APIKEY}
 
 service:
   pipelines:
     traces:
       receivers: [otlp]
       processors: [batch]
-      exporters: [debug]
+      exporters: [debug, otlphttp/mackerel]

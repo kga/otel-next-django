@@ -18,12 +18,13 @@ services:
       timeout: 5s
       retries: 10
 
-  otel-collector:
+  otel-collector-next-django:
     image: otel/opentelemetry-collector:latest
-    container_name: otel-collector
+    container_name: otel-collector-next-django
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
       - ./otel-collector/config.yaml:/etc/otel-collector-config.yaml
+    env_file: .env
     ports:
       - "4317:4317"   # OTLP gRPC receiver
       - "4318:4318"   # OTLP HTTP receiver
@@ -41,7 +42,7 @@ services:
       DB_NAME: userdb
       DB_USER: dbuser
       DB_PASSWORD: dbpassword
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector-next-django:4317
       OTEL_SERVICE_NAME: django-backend
       OTEL_TRACES_EXPORTER: otlp
       OTEL_METRICS_EXPORTER: none
@@ -51,7 +52,7 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      otel-collector:
+      otel-collector-next-django:
         condition: service_started
 
   frontend:
@@ -61,14 +62,14 @@ services:
     container_name: nextjs-frontend
     environment:
       BACKEND_URL: http://backend:8000
-      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector-next-django:4317
       OTEL_SERVICE_NAME: nextjs-frontend
       NODE_ENV: production
     ports:
       - "3000:3000"
     depends_on:
       - backend
-      - otel-collector
+      - otel-collector-next-django
 
 volumes:
   mysql_data:
