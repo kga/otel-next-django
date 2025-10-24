@@ -20,10 +20,11 @@ OpenTelemetry 自動計装を使用した Next.js + Django + MySQL のデモア�
 
 ### 前提条件
 
-- Docker
-- Docker Compose
+Docker Compose を用いて動作させます。docker と docker-compose がインストールされていることを確認してください。
 
-### アプリケーションの実行
+### アプリケーションの実行方法
+
+以下のコマンドを実行すると [docker-compose.yml](docker-compose.yml) ファイルに定義されたすべてのサービスがビルドおよび起動されます。
 
 ```bash
 docker compose up --build
@@ -31,13 +32,15 @@ docker compose up --build
 
 ### アプリケーションへのアクセス
 
+アプリケーションには以下の URL でアクセスできます。バックエンド API 並びに MySQL はフロントエンドの URL から利用されるので、通常は個別にアクセスする必要はありません。フロントエンドのページを開くと、バックエンド API からユーザーデータが取得され表示され、トレースデータが生成されます。
+
 - フロントエンド: http://localhost:3000
 - バックエンド API: http://localhost:8000/api/users
 - MySQL: localhost:3306 (ユーザー: dbuser, パスワード: dbpassword, データベース: userdb)
 
 ### トレースの確認
 
-トレースは OpenTelemetry Collector のコンソール出力に表示されます。アプリケーション実行中にコンソールで `otel-collector-next-django` のログを確認できます。
+トレースは OpenTelemetry Collector のコンソール出力に表示されます。アプリケーション実行中にコンソールで `otel-collector-next-django` のログを確認できます。また、Mackerel のダッシュボードでもトレースを確認できます。
 
 ### アプリケーションの停止
 
