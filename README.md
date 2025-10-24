@@ -22,6 +22,22 @@ OpenTelemetry 自動計装を使用した Next.js + Django + MySQL のデモア�
 
 Docker Compose を用いて動作させます。docker と docker-compose がインストールされていることを確認してください。
 
+### 環境変数の設定
+
+アプリケーションを起動する前に、環境変数を設定する必要があります。
+
+プロジェクトルートで `.env.example` をコピーして `.env` ファイルを作成してください：
+
+```bash
+cp .env.example .env
+```
+
+`.env` ファイルを編集し、Mackerel の API キーを設定してください：
+
+```bash
+MACKEREL_APIKEY=your_actual_mackerel_api_key_here
+```
+
 ### アプリケーションの実行方法
 
 以下のコマンドを実行すると [docker-compose.yml](docker-compose.yml) ファイルに定義されたすべてのサービスがビルドおよび起動されます。
@@ -58,6 +74,7 @@ docker compose down -v
 .
 ├── docker-compose.yml
 ├── .env                             # 環境変数（Mackerel API キーなど）
+├── .env.example                     # 環境変数のテンプレート
 ├── frontend/
 │   ├── Dockerfile
 │   ├── package.json
@@ -102,11 +119,3 @@ docker compose down -v
 - デバッグエクスポーターでコンソールに出力
 - Mackerel エクスポーターで Mackerel に送信
 - `otel-collector/config.yaml` で設定
-
-## 環境変数設定
-
-プロジェクトルートに `.env` ファイルを作成し、以下の変数を設定してください：
-
-```bash
-MACKEREL_APIKEY=your_mackerel_api_key_here
-```
