@@ -1,102 +1,109 @@
-# OpenTelemetry Tracing Demo
+# OpenTelemetry トレーシングデモ
 
-Next.js + Django + MySQL with OpenTelemetry automatic instrumentation.
+OpenTelemetry 自動計装を使用した Next.js + Django + MySQL のデモアプリケーション
 
-## Architecture
+## アーキテクチャ
 
-- **Frontend**: Next.js (App Router) on `http://localhost:3000`
-- **Backend**: Django REST API on `http://localhost:8000`
-- **Database**: MySQL on `localhost:3306`
-- **Telemetry**: OpenTelemetry Collector on ports 4317 (gRPC) and 4318 (HTTP)
+- **フロントエンド**: Next.js (App Router) - `http://localhost:3000`
+- **バックエンド**: Django REST API - `http://localhost:8000`
+- **データベース**: MySQL - `localhost:3306`
+- **テレメトリ**: OpenTelemetry Collector - ポート 4317 (gRPC) と 4318 (HTTP)
 
-## Data Flow
+## データフロー
 
-1. User accesses `http://localhost:3000/`
-2. Next.js fetches data from `http://backend:8000/api/users`
-3. Django queries MySQL for user data (100 sample records)
-4. All traces are sent to OpenTelemetry Collector and output to console via debug exporter
+1. ユーザーが `http://localhost:3000/` にアクセス
+2. Next.js が `http://backend:8000/api/users` からデータを取得
+3. Django が MySQL にユーザーデータをクエリ（100件のサンプルレコード）
+4. すべてのトレースが OpenTelemetry Collector に送信され、デバッグエクスポーターとMackerelエクスポーター経由で出力
 
-## Getting Started
+## はじめに
 
-### Prerequisites
+### 前提条件
 
 - Docker
 - Docker Compose
 
-### Run the Application
+### アプリケーションの実行
 
 ```bash
 docker compose up --build
 ```
 
-### Access the Application
+### アプリケーションへのアクセス
 
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000/api/users
-- MySQL: localhost:3306 (user: dbuser, password: dbpassword, database: userdb)
+- フロントエンド: http://localhost:3000
+- バックエンド API: http://localhost:8000/api/users
+- MySQL: localhost:3306 (ユーザー: dbuser, パスワード: dbpassword, データベース: userdb)
 
-### View Traces
+### トレースの確認
 
-Traces will be displayed in the OpenTelemetry Collector console output. Look for the `otel-collector` container logs:
+トレースは OpenTelemetry Collector のコンソール出力に表示されます。アプリケーション実行中にコンソールで `otel-collector-next-django` のログを確認できます。
 
-```bash
-docker compose logs -f otel-collector
-```
+### アプリケーションの停止
 
-### Stop the Application
+`Ctrl+C` でアプリケーションを停止できます。
 
-```bash
-docker compose down
-```
-
-To remove volumes as well:
+コンテナとボリュームを完全に削除する場合：
 
 ```bash
 docker compose down -v
 ```
 
-## Project Structure
+## プロジェクト構成
 
 ```
 .
 ├── docker-compose.yml
+├── .env                             # 環境変数（Mackerel API キーなど）
 ├── frontend/
 │   ├── Dockerfile
 │   ├── package.json
 │   ├── next.config.js
-│   ├── instrumentation.ts          # OpenTelemetry setup
+│   ├── instrumentation.ts          # OpenTelemetry 設定
 │   └── app/
 │       ├── layout.tsx
-│       └── page.tsx                # Main page that calls backend API
+│       └── page.tsx                # バックエンド API を呼び出すメインページ
 ├── backend/
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   ├── manage.py
 │   ├── config/
-│   │   ├── settings.py             # Django settings with MySQL config
-│   │   └── urls.py                 # URL routing
+│   │   ├── settings.py             # MySQL 設定を含む Django 設定
+│   │   └── urls.py                 # URL ルーティング
 │   └── users/
-│       ├── models.py                # User model
-│       └── views.py                 # API endpoint
+│       ├── models.py               # User モデル
+│       └── views.py                # API エンドポイント
 ├── mysql/
-│   └── init.sql                     # Initial data (100 users)
+│   └── init.sql                    # 初期データ（100 ユーザー）
 └── otel-collector/
-    └── config.yaml                  # OTEL Collector config with debug exporter
+    └── config.yaml                 # OTEL Collector 設定（デバッグ・Mackerel エクスポーター）
 ```
 
-## OpenTelemetry Configuration
+## OpenTelemetry 設定
 
 ### Next.js (Node.js)
-- Auto-instrumentation via `@opentelemetry/auto-instrumentations-node`
-- OTLP gRPC exporter to Collector
-- Configured in `instrumentation.ts`
+
+- `@opentelemetry/auto-instrumentations-node` による自動計装
+- Collector への OTLP gRPC エクスポーター
+- `instrumentation.ts` で設定
 
 ### Django (Python)
-- Auto-instrumentation via `opentelemetry-instrument` CLI
-- Includes Django and MySQL instrumentation
-- OTLP exporter to Collector
+
+- `opentelemetry-instrument` CLI による自動計装
+- Django と MySQL の計装を含む
+- Collector への OTLP エクスポーター
 
 ### Collector
-- Receives traces via OTLP (gRPC and HTTP)
-- Exports to console via debug exporter
-- Configuration in `otel-collector/config.yaml`
+
+- OTLP（gRPC と HTTP）でトレースを受信
+- デバッグエクスポーターでコンソールに出力
+- Mackerel エクスポーターで Mackerel に送信
+- `otel-collector/config.yaml` で設定
+
+## 環境変数設定
+
+プロジェクトルートに `.env` ファイルを作成し、以下の変数を設定してください：
+
+```bash
+MACKEREL_APIKEY=your_mackerel_api_key_here
+```
