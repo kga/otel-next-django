@@ -16,7 +16,7 @@ OpenTelemetry 自動計装を使用した Next.js + Django + MySQL のデモア�
 3. Django が MySQL にユーザーデータをクエリ（100件のサンプルレコード）
 4. すべてのトレースが OpenTelemetry Collector に送信され、デバッグエクスポーターとMackerelエクスポーター経由で出力
 
-## はじめに
+## 実行方法
 
 ### 前提条件
 
